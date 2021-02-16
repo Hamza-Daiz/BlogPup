@@ -31,6 +31,10 @@ dependencies:
   introduction_screen: ^1.0.7
   shared_preferences: ^0.5.12+4
 
+  # firebase :
+  firebase_core: ^0.7.0
+  firebase_auth: ^0.20.0+1
+
 
 dev_dependencies:
   flutter_test:
