@@ -48,15 +48,12 @@ class OnBoarding extends StatelessWidget {
         ),
         title: "CRISIS FLUTTER 3",
         body: "best way to spread the knowledge 3",
-
       ),
     ];
   }
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home:Scaffold(
+    return Scaffold(
         body: IntroductionScreen(
           done: Text('Continue',
             style: TextStyle(
@@ -71,10 +68,8 @@ class OnBoarding extends StatelessWidget {
           pages: getPages(),
           dotsDecorator: DotsDecorator(
             activeColor: Color(0xff2b106a),
-
           ),
         ),
-      ) ,
     );
   }
 }
