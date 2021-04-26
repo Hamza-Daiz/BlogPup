@@ -20,12 +20,6 @@ class _ProfileScreen extends State<ProfileScreen> {
   _ProfileScreen({this.id});
   AuthService _auth= AuthService();
   final UsersData=Firestore.instance.collection("UsersProfiles");
-  final _Pages=<Widget>[
-    Icon(Icons.home,size: 40),
-    Icon(Icons.menu,size: 40),
-    Icon(Icons.search_rounded,size: 40),
-    Icon(Icons.person,size: 40,)
-  ];
   @override
   Widget build(BuildContext context) {
     var size=MediaQuery.of(context).size;
@@ -34,57 +28,7 @@ class _ProfileScreen extends State<ProfileScreen> {
         builder: (context,snapshot) {
           var user=snapshot.data;
           if (snapshot.hasData) {
-            return DefaultTabController(
-                length: 4,
-                child: Scaffold(
-                    backgroundColor:Colors.white,
-                    appBar:AppBar(
-                      centerTitle: true,
-                      backgroundColor:Color(0xff2b106a),
-                      title: Text(
-                        "Profile",
-                        style: TextStyle(
-                          fontSize:22,
-                          color: Color(0xFFFBEAFF),
-                          fontFamily:"Montserrat",
-                        ),
-                      ),
-                      actions: [
-                        IconButton(
-                            icon: Icon(Icons.add,color: Colors.white,size: 30,),
-                            onPressed: (){}
-                        )],
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            bottomRight:Radius.circular(20),
-                            bottomLeft: Radius.circular(20),
-                          )
-                      ),
-                    ),
-                    bottomNavigationBar:Container(
-                      decoration: BoxDecoration(
-                          color: Color(0xff2b106a),
-                          borderRadius: BorderRadius.only(
-                            topRight:Radius.circular(20),
-                            topLeft: Radius.circular(20),
-                          )
-                      ),
-                      padding: EdgeInsets.only(top: 10),
-                      child: TabBar(
-                        labelColor: Colors.greenAccent,
-                        unselectedLabelColor: Colors.white,
-                        indicatorWeight: 3,
-                        indicatorColor:Colors.greenAccent,
-                        tabs:_Pages,
-                      ),
-                    ),
-                    drawer: Drawer(),
-                    body:TabBarView(
-                      children:[
-                        Center(child: Text("Hola",style: TextStyle(fontSize: 60),)),
-                        Center(child: Text("Hala",style: TextStyle(fontSize: 60),)),
-                        Center(child: Text("Hila",style: TextStyle(fontSize: 60),)),
-                        SingleChildScrollView(
+            return SingleChildScrollView(
                           child:Column(
                             children: [
                               SizedBox(height:30),
@@ -165,11 +109,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                               )
                             ],
                           ),
-                        ),
-                      ],
-                    )
-                )
-            );
+                        );
           }
           else{
             return LoadingScreen();

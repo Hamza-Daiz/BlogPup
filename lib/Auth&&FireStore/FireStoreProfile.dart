@@ -19,6 +19,29 @@ class Fire {
       print(e.toString());
     }
   }
+  Future UploadaPost(String title,String category,String text,String id,String imageurl,int nbrposts)async{
+     try {
+       await fire.collection("Posts").document().setData(
+         {
+           "Title":title,
+           "Category":category,
+           "Text":text,
+           "Owner":id,
+           "ImageUrl":imageurl,
+           "nbrlikes":0,
+           "nbrcomments":0,
+         }
+       );
+        await fire.collection("UsersProfiles").document(id).updateData(
+        {
+          "nbrposts":nbrposts
+        }
+       );
+
+     } on Exception catch (e) {
+       print(e.toString());
+     }
+  }
   Future delete(String path)async{
     await fire.collection(path).document(id).delete();
   }
@@ -43,6 +66,7 @@ class Fire {
             "Username":Username,
             "Education":Education,
             "UserImageUrl":UserImageUrl,
+            "LikedPosts":[]
           }
       );
     } on Exception catch (e) {

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:blogging_app/Auth&&FireStore/Auth.dart';
 import 'package:blogging_app/Auth&&FireStore/FireStoreProfile.dart';
 import 'package:blogging_app/OurWidgets&&Functions/Profile&&EditeProfile.dart';
 import 'package:blogging_app/screens/LoadingScreen.dart';
@@ -29,6 +30,7 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
   bool picked=false;
   bool waiting=false;
   final UserData=Firestore.instance.collection("UsersProfiles");
+  AuthService _auth=AuthService();
   File _image;
   @override
   Widget build(BuildContext context) {
@@ -68,7 +70,113 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                       )
                   ),
                 ),
-                drawer: Drawer(),
+                drawer: Drawer(
+                  child: Column(
+                    children: [
+                      Container(
+                          color: Colors.deepPurple,
+                          child:Padding(
+                            padding: EdgeInsets.only(top: 30,bottom: 30,left: 10),
+                            child:Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor:Colors.white,
+                                  backgroundImage:user.UserImageUrl==null?AssetImage("assets/images/userwithoutprofileimage.png"):NetworkImage(user.UserImageUrl),
+                                  radius: 40,
+                                ),
+                                SizedBox(width: 10,),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        child: Text(
+                                          user.Username,
+                                          textScaleFactor: MediaQuery.of(context).textScaleFactor,
+                                          style: TextStyle(
+                                              fontSize:20,
+                                              color: Colors.white,
+                                              fontFamily: "Montserrat",
+                                              fontWeight: FontWeight.bold
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 5,),
+                                      Container(
+                                        child: Text(
+                                          user.Location,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.white,
+                                            fontFamily: "Montserratmini",
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+
+                      ),
+                      Expanded(
+                        child: Container(
+                          color: Colors.deepPurpleAccent,
+                          padding: EdgeInsets.only(top:50),
+                          child: ListView(
+                            children: [
+                              ListTile(
+                                leading: IconButton(
+                                  icon:Icon(
+                                    Icons.edit,
+                                    size: 30,
+                                    color:Colors.greenAccent,
+                                  ),
+                                  onPressed: (){
+                                    Navigator.pushReplacement(context,MaterialPageRoute(builder:(context)=>EditeProfileScreen(id:id,)));
+                                  },
+                                ),
+                                title: Text(
+                                  "Edit Profile",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontFamily: "Montserrat",
+                                  ),
+                                ),
+                              ),
+                              ListTile(
+                                leading: IconButton(
+                                  icon:Icon(
+                                    Icons.logout,
+                                    size: 30,
+                                    color:Colors.greenAccent,
+                                  ),
+                                  onPressed: ()async{
+                                    await _auth.SignOut();
+                                    Navigator.pushReplacementNamed(context, "LogIn");
+                                  },
+                                ),
+                                title: Text(
+                                  "Log out",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                    fontFamily: "Montserrat",
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 body: Form(
                   key:_formkey,
                   child: SingleChildScrollView(
@@ -305,7 +413,6 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
           }
         });
       }
-
     }
   }
   Future UploadImage()async{
@@ -324,7 +431,6 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
     on Exception catch (e) {
       print(e.toString());
     }
-
   }
 
 }

@@ -1,5 +1,6 @@
 import 'package:blogging_app/Auth&&FireStore/FireStoreProfile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class Userid{
   String id;
   Userid({this.id});
@@ -52,4 +53,15 @@ class AuthService{
       return null;
     }
   }
+}
+WriteLoginStatue(bool Statue)async{
+  final prefers=await SharedPreferences.getInstance();
+  final key="Statue";
+  prefers.setBool(key,Statue);
+}
+ReadLoginStatue()async{
+  final prefers=await SharedPreferences.getInstance();
+  final key="Statue";
+  final value=prefers.getBool(key) ?? false;
+  return value;
 }

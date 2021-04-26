@@ -268,8 +268,6 @@ InputDecoration NameFieldDecoration(String content){
         borderSide: BorderSide(color: Color(0xff2b106a),width: 2),
       )
   );
-
-
 }
 InputDecoration AboutFieldDecoration(){
   return InputDecoration(

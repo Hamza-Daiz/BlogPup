@@ -1,5 +1,6 @@
 import 'package:blogging_app/Auth&&FireStore/Auth.dart';
 import 'package:blogging_app/OurWidgets&&Functions/SignUp.dart';
+import 'package:blogging_app/screens/HomePage.dart';
 import 'package:blogging_app/screens/LoadingScreen.dart';
 import 'package:blogging_app/screens/Profile_Screen.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Userid user;
   @override
   Widget build(BuildContext context) {
+    print("${ReadLoginStatue()}");
     final double widthScreen = MediaQuery
         .of(context)
         .size
@@ -129,11 +131,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                       _PasswordController.text);
                                   if (result!=null) {
                                     user = await _auth.UserFromDatabase(result);
+                                    WriteLoginStatue(true);
                                     Navigator.pushReplacement(context,
                                         MaterialPageRoute(builder: (context) =>
-                                            ProfileScreen(id: user.id)));
+                                            HomePage(id: user.id)));
                                   }
-
                                   if(result==null){
                                     setState(() {
                                       IncorrectPassword=true;
@@ -144,8 +146,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                     Waiting=false;
                                   });
                                   IncorrectPassword=false;
-
-
                                 }
                               },
                               child: Text(
