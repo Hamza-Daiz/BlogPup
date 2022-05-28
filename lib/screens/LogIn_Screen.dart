@@ -1,16 +1,22 @@
 import 'package:blogging_app/Auth&&FireStore/Auth.dart';
 import 'package:blogging_app/OurWidgets&&Functions/SignUp.dart';
+import 'package:blogging_app/main.dart';
 import 'package:blogging_app/screens/HomePage.dart';
 import 'package:blogging_app/screens/LoadingScreen.dart';
 import 'package:blogging_app/screens/Profile_Screen.dart';
+import 'package:blogging_app/screens/ResetPasswordScreen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:blogging_app/screens/SignUp_Screen.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 class _LoginScreenState extends State<LoginScreen> {
+
   AuthService _auth = AuthService();
   GlobalKey<FormState> globalKey = new GlobalKey<FormState>();
   final _EmailController = TextEditingController();
@@ -19,8 +25,10 @@ class _LoginScreenState extends State<LoginScreen> {
   bool Waiting = false;
   bool IncorrectPassword=false;
   Userid user;
+
   @override
   Widget build(BuildContext context) {
+
     print("${ReadLoginStatue()}");
     final double widthScreen = MediaQuery
         .of(context)
@@ -33,18 +41,25 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Color(0xffFBEAFF),
       body: Center(
+
         child: SingleChildScrollView(
+
           child: SafeArea(
+
             child:  Form(
               key: globalKey,
+
               child: Container(
                 width: widthScreen * (0.8),
                 //height: heightScreen * (1.5),
+
                 margin: EdgeInsets.symmetric(horizontal: 30,),
+
                 child: Center(
                   child:
                       Column(
                         children: [
+
                           Text(
                             'LOG IN',
                             style: TextStyle(
@@ -53,10 +68,24 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+
+                          // email :
                           TextFormField(
                             showCursor: true,
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
+                                errorBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 2,
+                                        color: Colors.red
+                                    )
+                                ),
+                                focusedErrorBorder:UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 2,
+                                        color: Colors.red
+                                    )
+                                ),
                               errorStyle: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -72,16 +101,37 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Color(0xffc7c1cc),
                                 fontSize: 20,
                               ),
+                              focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color(0xff2B106A),
+                                  width: 2
+                                )
+                              )
                             ),
                             controller: _EmailController,
                             validator:EmailValidator,
                           ),
+
                           SizedBox(height: 20,),
+
+                          //password
                           TextFormField(
                             obscureText: !isVisibile,
                             showCursor: true,
                             keyboardType: TextInputType.text,
                             decoration: InputDecoration(
+                                errorBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 2,
+                                        color: Colors.red
+                                    )
+                                ),
+                                focusedErrorBorder:UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 2,
+                                        color: Colors.red
+                                    )
+                                ),
                               errorStyle: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -109,18 +159,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Color(0xffc7c1cc),
                                 fontSize: 20,
                               ),
+                              focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xff2B106A),
+                                        width: 2
+                                    )
+                                )
                             ),
                             controller: _PasswordController,
                             validator: PasswordValidatorAll,
                           ),
+
                           Container(
                             alignment: Alignment.center,
-                            margin: EdgeInsets.symmetric(vertical: 30),
-                            child:Waiting?spin():FlatButton(
+                            margin: EdgeInsets.only(top: 30,),
+
+                            child:
+                            Waiting ? spin() : FlatButton(
                               color: Color(0xff2B106A),
                               minWidth: widthScreen * (0.8),
                               height: 50,
                               onPressed: () async {
+
                                 if (validateAndSave()) {
                                   setState(() {
                                     Waiting=true;
@@ -129,12 +189,25 @@ class _LoginScreenState extends State<LoginScreen> {
                                       .LoginWithEmailAndPassword(
                                       _EmailController.text.trim(),
                                       _PasswordController.text);
-                                  if (result!=null) {
+
+                                  if (result != null) {
+
+                                    //Shared preference :
+                                    SharedPreferences prefs = await SharedPreferences.getInstance() ;
+                                    print(_EmailController.text.trim());
+                                    prefs.setString("email",_EmailController.text.trim());
+
+
                                     user = await _auth.UserFromDatabase(result);
+                                    print(user.id);
+                                    prefs.setString("userId", user.id);
                                     WriteLoginStatue(true);
-                                    Navigator.pushReplacement(context,
+
+                                    Navigator.pushReplacement(
+                                        context,
                                         MaterialPageRoute(builder: (context) =>
-                                            HomePage(id: user.id)));
+                                            HomePage(id:user.id))
+                                    );
                                   }
                                   if(result==null){
                                     setState(() {
@@ -148,6 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   IncorrectPassword=false;
                                 }
                               },
+
                               child: Text(
                                 'LOG IN',
                                 style: TextStyle(
@@ -161,76 +235,23 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
-                          FlatButton(
-                            color: Color(0xffFBEAFF),
-                            minWidth: widthScreen * (0.8),
-                            onPressed: () {
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                children: [
-                                  Image.asset(
-                                    "assets/images/google.png", height: 30,),
-                                  SizedBox(width: 30,),
-                                  Text(
-                                    'LOG IN WITH GOOGLE',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color: Color(0xff2B106A),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(80),
-                                side: BorderSide(
-                                  color: Color(0xff2B106A),
-                                )
-                            ),
+
+                          TextButton(
+                            child: Text("Forgot Password?"),
+                            onPressed:(){
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ResetPassword()));
+                           },
                           ),
+
                           SizedBox(height: 10,),
-                          FlatButton(
-                            color: Color(0xffFBEAFF),
-                            minWidth: widthScreen * (0.8),
-                            onPressed: () {},
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                children: [
-                                  Image.asset(
-                                    "assets/images/facebook.png", height: 30,),
-                                  SizedBox(width: 30,),
-                                  Text(
-                                    'LOG IN WITH FACEBOOK',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      color: Color(0xff2B106A),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(80),
-                                side: BorderSide(
-                                  color: Color(0xff2B106A),
-                                )
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 50.0),
-                            child: Text(
+
+                          Text(
                               'Don''t have an account ?',
                               style: TextStyle(
                                 color: Color(0xff4B4553),
                                 fontSize: 15,
                               ),
                             ),
-                          ),
                           SizedBox(
                             height: 10,
                           ),
@@ -266,6 +287,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
     );
   }
+
   Widget spin(){
     return Center(
       child: SpinKitThreeBounce(
@@ -274,6 +296,8 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+  // ignore: non_constant_identifier_names
   String PasswordValidatorAll(String value){
     if (value.toString().isEmpty) {
       return "please enter your Password";

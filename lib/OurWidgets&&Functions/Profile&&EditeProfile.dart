@@ -9,7 +9,7 @@ Widget Simplecolumn(String nbr, String content){
         style: TextStyle(
             color: Colors.black,
             fontFamily: "Montserrat",
-            fontSize: 20
+            fontSize: 17
         ),
       ),
       SizedBox(height: 7,),
@@ -18,7 +18,7 @@ Widget Simplecolumn(String nbr, String content){
         style: TextStyle(
           color: Colors.black,
           fontFamily: "Montserratmini",
-          fontSize: 18,
+          fontSize: 16,
         ),
       ),
     ],
@@ -102,7 +102,7 @@ Widget katbaWithIconPortfolio(String title,String content,Widget icon){
           SizedBox(width: 5,),
           Expanded(
             child: Text(
-              content,
+              content==null ? "" : content,
               overflow: TextOverflow.ellipsis,
               maxLines: 3,
               style: TextStyle(
@@ -235,6 +235,7 @@ Widget TextAboveField(String content){
     ),
   );
 }
+
 InputDecoration NameFieldDecoration(String content){
   return InputDecoration(
       contentPadding: EdgeInsets.only(top: 20,left: 20),

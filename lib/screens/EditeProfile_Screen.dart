@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:blogging_app/Auth&&FireStore/Auth.dart';
 import 'package:blogging_app/Auth&&FireStore/FireStoreProfile.dart';
 import 'package:blogging_app/OurWidgets&&Functions/Profile&&EditeProfile.dart';
+import 'package:blogging_app/screens/Contact_Screen.dart';
 import 'package:blogging_app/screens/LoadingScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -11,13 +12,23 @@ import 'package:flutter/widgets.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'LogIn_Screen.dart';
+
 class EditeProfileScreen extends StatefulWidget {
+
   String id;
   EditeProfileScreen({this.id});
+
   @override
   _EditeProfileScreenState createState() => _EditeProfileScreenState(id:id);
 }
+
 class _EditeProfileScreenState extends State<EditeProfileScreen> {
+
+  bool nameAlready = false;
+  bool portfoliohttp = true;
+
   String  id;
   _EditeProfileScreenState({this.id});
   final _formkey=GlobalKey<FormState>();
@@ -32,13 +43,25 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
   final UserData=Firestore.instance.collection("UsersProfiles");
   AuthService _auth=AuthService();
   File _image;
+
+  @override
+  void initState() {
+    nameAlready = false;
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-    var size=MediaQuery.of(context).size;
+
+    var size = MediaQuery.of(context).size;
+
     return StreamBuilder<Userdata>(
-        stream:Fire(id:id).data,
+
+        stream : Fire(id:id).data,
+
         builder: (context, snapshot) {
+
           Userdata user=snapshot.data;
+
           if (snapshot.hasData) {
             return GestureDetector(
               onTap: (){
@@ -57,135 +80,21 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                       fontFamily:"Montserrat",
                     ),
                   ),
-                  actions: [
-                    IconButton(
-                        icon: Icon(Icons.add,color: Colors.white,size: 30,),
-                        onPressed: (){}
-                    )
-                  ],
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomRight:Radius.circular(20),
-                        bottomLeft: Radius.circular(20),
-                      )
-                  ),
                 ),
-                drawer: Drawer(
-                  child: Column(
-                    children: [
-                      Container(
-                          color: Colors.deepPurple,
-                          child:Padding(
-                            padding: EdgeInsets.only(top: 30,bottom: 30,left: 10),
-                            child:Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor:Colors.white,
-                                  backgroundImage:user.UserImageUrl==null?AssetImage("assets/images/userwithoutprofileimage.png"):NetworkImage(user.UserImageUrl),
-                                  radius: 40,
-                                ),
-                                SizedBox(width: 10,),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        child: Text(
-                                          user.Username,
-                                          textScaleFactor: MediaQuery.of(context).textScaleFactor,
-                                          style: TextStyle(
-                                              fontSize:20,
-                                              color: Colors.white,
-                                              fontFamily: "Montserrat",
-                                              fontWeight: FontWeight.bold
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 5,),
-                                      Container(
-                                        child: Text(
-                                          user.Location,
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.white,
-                                            fontFamily: "Montserratmini",
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          )
 
-                      ),
-                      Expanded(
-                        child: Container(
-                          color: Colors.deepPurpleAccent,
-                          padding: EdgeInsets.only(top:50),
-                          child: ListView(
-                            children: [
-                              ListTile(
-                                leading: IconButton(
-                                  icon:Icon(
-                                    Icons.edit,
-                                    size: 30,
-                                    color:Colors.greenAccent,
-                                  ),
-                                  onPressed: (){
-                                    Navigator.pushReplacement(context,MaterialPageRoute(builder:(context)=>EditeProfileScreen(id:id,)));
-                                  },
-                                ),
-                                title: Text(
-                                  "Edit Profile",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                    fontFamily: "Montserrat",
-                                  ),
-                                ),
-                              ),
-                              ListTile(
-                                leading: IconButton(
-                                  icon:Icon(
-                                    Icons.logout,
-                                    size: 30,
-                                    color:Colors.greenAccent,
-                                  ),
-                                  onPressed: ()async{
-                                    await _auth.SignOut();
-                                    Navigator.pushReplacementNamed(context, "LogIn");
-                                  },
-                                ),
-                                title: Text(
-                                  "Log out",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                    fontFamily: "Montserrat",
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 body: Form(
                   key:_formkey,
+
                   child: SingleChildScrollView(
+
                     padding: const EdgeInsets.only(left: 30,right: 30),
-                    child:
-                    Column(
+
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+
                         SizedBox(height:30),
+
                         Center(
                           child: Stack(
                             overflow: Overflow.visible,
@@ -193,9 +102,12 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                             children: [
                               CircleAvatar(
                                 backgroundColor: Colors.white,
-                                backgroundImage:!picked?(user.UserImageUrl!=null?NetworkImage(user.UserImageUrl):(_image==null?AssetImage("assets/images/userwithoutprofileimage.png"):FileImage(_image))):FileImage(_image),
+                                backgroundImage:!picked ? (user.UserImageUrl != null ? NetworkImage(user.UserImageUrl)
+                                    :(_image==null?AssetImage("assets/images/userwithoutprofileimage.png"):FileImage(_image)))
+                                    :FileImage(_image),
                                 radius: 45,
                               ),
+
                               Positioned(
                                 bottom: -10,
                                 right: -10,
@@ -209,14 +121,33 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                             ],
                           ),
                         ),
+
                         SizedBox(height:20),
+
                         TextAboveField("Name"),
+
                         SizedBox(height: 7,),
+
                         TextFormField(
                             initialValue: _Name??user.Username,
-                            onChanged: (value){
+                            onChanged: (value) async{
+
+                              final documentUsers = await Firestore.instance.collection("UsersProfiles") ;
+
                               setState(() {
                                 _Name=value;
+                              });
+
+                              nameAlready= false;
+
+                              documentUsers.getDocuments().then((QuerySnapshot snapshot){
+
+                                snapshot.documents.forEach((DocumentSnapshot doc) {
+
+                                  if (_Name == doc.data["Username"]) setState(() {
+                                    nameAlready= true;
+                                  });
+                                });
                               });
                             },
                             keyboardType: TextInputType.text,
@@ -228,9 +159,13 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                             ),
                             decoration:NameFieldDecoration("Name")
                         ),
+
                         SizedBox(height:20),
+
                         TextAboveField("Location"),
+
                         SizedBox(height: 7,),
+
                         TextFormField(
                             initialValue: _Location??user.Location,
                             onChanged: (value){
@@ -247,9 +182,13 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                             ),
                             decoration:NameFieldDecoration("Location")
                         ),
+
                         SizedBox(height:20),
+
                         TextAboveField("About"),
+
                         SizedBox(height: 7,),
+
                         TextFormField(
                           initialValue: _Aboutuser??user.Aboutuser,
                           onChanged: (value){
@@ -259,7 +198,7 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                           },
                           maxLines: 4,
                           maxLengthEnforced: true,
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.multiline,
                           validator: AboutValidator,
                           style: TextStyle(
                               color:Colors.black,
@@ -268,9 +207,13 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                           ),
                           decoration:NameFieldDecoration("About"),
                         ),
+
                         SizedBox(height: size.height*(0.015),),
+
                         TextAboveField("Education"),
+
                         SizedBox(height: 7,),
+
                         TextFormField(
                           initialValue: _Education??user.Education,
                           onChanged: (value){
@@ -278,7 +221,7 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                               _Education=value;
                             });
                           },
-                          keyboardType: TextInputType.text,
+                          keyboardType: TextInputType.multiline,
                           validator: SkillsValidator,
                           style: TextStyle(
                               color:Colors.black,
@@ -287,28 +230,64 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                           ),
                           decoration:NameFieldDecoration("Location"),
                         ),
+
                         SizedBox(height:20),
+
                         TextAboveField("Portfolio"),
+
                         SizedBox(height: 7,),
-                        TextFormField(
-                            initialValue: _Portfolio??user.Portfolio,
-                            onChanged: (value){
-                              setState(() {
-                                _Portfolio=value;
-                              });
-                            },
-                            keyboardType: TextInputType.text,
-                            validator: PortfolioValidator,
-                            style: TextStyle(
-                                color:Colors.black,
-                                fontSize: 16,
-                                fontFamily: "Montserratmini"
+
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 15,horizontal: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                "https://",
+                                style: TextStyle(
+                                    color:Colors.black,
+                                    fontSize: 16,
+                                    fontFamily: "Montserratmini"
+                                ),
+                              ),
                             ),
-                            decoration:NameFieldDecoration("Portfolio")
+
+                            SizedBox(width: 3,),
+
+                            Expanded(
+                              child: TextFormField(
+                                  initialValue: user.Portfolio == null ? "" :
+                                  (user.Portfolio.contains("https://")? user.Portfolio.substring(8):user.Portfolio),
+
+                                  onChanged: (value){
+                                    setState(() {
+                                      _Portfolio=value;
+                                    });
+                                    _Portfolio.contains("https://") ? portfoliohttp = true : portfoliohttp = false;
+                                  },
+
+                                  keyboardType: TextInputType.text,
+                                  validator: PortfolioValidator,
+                                  style: TextStyle(
+                                      color:Colors.black,
+                                      fontSize: 16,
+                                      fontFamily: "Montserratmini"
+                                  ),
+                                  decoration : NameFieldDecoration("Portfolio")
+                              ),
+                            ),
+                          ],
                         ),
+
                         SizedBox(height:20),
+
                         TextAboveField("Skills"),
+
                         SizedBox(height: 7,),
+
                         TextFormField(
                             initialValue: _Skills??user.Skills,
                             onChanged: (value){
@@ -316,9 +295,8 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                                 _Skills=value;
                               });
                             },
-                            maxLines: 2,
-                            maxLengthEnforced: true,
-                            keyboardType: TextInputType.text,
+                            maxLines: null,
+                            keyboardType: TextInputType.multiline,
                             validator: SkillsValidator,
                             style: TextStyle(
                                 color:Colors.black,
@@ -327,9 +305,11 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                             ),
                             decoration:NameFieldDecoration("Skills")
                         ),
+
                         SizedBox(height:20,),
+
                         Center(
-                            child: waiting?spinkit():RaisedButton(
+                            child: waiting ? spinkit() : RaisedButton(
                                 padding: EdgeInsets.symmetric(vertical: 5,horizontal: 30),
                                 splashColor: Color(0xff2b106a),
                                 color:Colors.greenAccent,
@@ -345,14 +325,14 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                                   ),
                                 ),
                                 onPressed: ()async{
-                                  if(_formkey.currentState.validate()){
+                                  if(_formkey.currentState.validate() && nameAlready ==false){
                                     setState(() {
                                       waiting=true;
                                     });
                                     await Fire(id:id).Updatedata(id, {
                                       "Location":_Location??user.Location,
                                       "Aboutuser":_Aboutuser??user.Aboutuser,
-                                      "Portfolio":_Portfolio??user.Portfolio,
+                                      "Portfolio": portfoliohttp ?  _Portfolio??user.Portfolio: "https://" + _Portfolio??user.Portfolio.substring(8),
                                       "Skills":_Skills??user.Skills,
                                       "Username":_Name??user.Username,
                                       "Education":_Education??user.Education,
@@ -364,6 +344,10 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
                                     setState(() {
                                       waiting=false;
                                     });
+                                  }else{
+                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                      content: Text("Name already used"),
+                                    ));
                                   }
                                 }
                             ),
@@ -382,8 +366,9 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
         }
     );
   }
+
   Future GetImageFromGallery()async{
-    File image=await ImagePicker.pickImage(source: ImageSource.gallery);
+    PickedFile image= await ImagePicker().getImage(source: ImageSource.gallery);
     File cropped;
     if (image!=null) {
       cropped= await ImageCropper.cropImage(
@@ -415,6 +400,7 @@ class _EditeProfileScreenState extends State<EditeProfileScreen> {
       }
     }
   }
+
   Future UploadImage()async{
     try {
       FirebaseStorage storage=FirebaseStorage(storageBucket: "gs://blogging-app-80378.appspot.com");

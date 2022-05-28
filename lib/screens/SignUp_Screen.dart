@@ -1,46 +1,99 @@
 import 'package:blogging_app/Auth&&FireStore/Auth.dart';
 import 'package:blogging_app/OurWidgets&&Functions/SignUp.dart';
+import 'package:blogging_app/screens/LogIn_Screen.dart';
 import 'package:flutter/material.dart';
+import 'package:email_auth/email_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
+
+import 'HomePage.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
 }
 class _SignUpScreenState extends State<SignUpScreen> {
+
   AuthService _auth=AuthService();
   GlobalKey<FormState> globalKey = new GlobalKey<FormState>();
-  final _EmailController=TextEditingController();
-  final _NameController=TextEditingController();
-  final _PasswordController=TextEditingController();
+  final _EmailController= TextEditingController();
+  final _NameController= TextEditingController();
+  final _PasswordController= TextEditingController();
+  final _OTPController= TextEditingController();
   bool  isVisibile = false;
   bool Waiting=false;
   bool EmailUsed=false;
+
+  void sendOTP() async{
+    EmailAuth.sessionName = "Test Session";
+    var res = await EmailAuth.sendOtp(receiverMail: _EmailController.text);
+    if (res){
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Otp sent"),
+      ));
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Could not sent the OTP"),
+      ));
+    }
+  }
+
+  bool verifyOTP(){
+    var res = EmailAuth.validate(receiverMail: _EmailController.text, userOTP: _OTPController.text);
+    if (res){
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+             content: Text("Otp Verified"),
+      ));
+      return true ;
+    }else{
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Invalid Otp"),
+      ));
+      return false ;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+
     final double widthScreen = MediaQuery.of(context).size.width;
     final double heightScreen = MediaQuery.of(context).size.height;
+
     return GestureDetector(
       onTap: (){
         FocusScope.of(context).requestFocus(FocusNode());
       },
+
       child: Scaffold(
+
         backgroundColor: Color(0xffFBEAFF),
+
         body:  Center(
+
           child: SingleChildScrollView(
+
             child: SafeArea(
+
               child:Form(
                 key: globalKey,
+
                 child: Container(
                   width: widthScreen * (0.8),
                   //height: heightScreen * (1.5),
                   margin: EdgeInsets.symmetric(horizontal:30,),
+
                   child: Center(
+
                     child: Stack(
                       alignment: Alignment.center,
                       overflow: Overflow.visible,
+
                       children: [
+
                         Column(
                           children: [
+
                             Text(
                               'SIGN UP',
                               style: TextStyle(
@@ -49,11 +102,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+
                             SizedBox(height: 20,),
+
+                            // name :
+
                             TextFormField(
                               showCursor: true,
                               keyboardType: TextInputType.name,
                               decoration: InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Color(0xff2B106A),
+                                          width: 2
+                                      )
+                                  ),
+                                errorBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 2,
+                                        color: Colors.red
+                                    )
+                                ),
+                                focusedErrorBorder:UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 2,
+                                        color: Colors.red
+                                    )
+                                ),
                                 errorStyle: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -73,11 +148,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               controller: _NameController,
                               validator: NameValidator
                             ),
+
                             SizedBox(height: 20,),
+
+                            // email :
+
                             TextFormField(
                               showCursor: true,
                               keyboardType: TextInputType.emailAddress,
                               decoration: InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xff2B106A),
+                                        width: 2
+                                    )
+                                ),
+                                errorBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 2,
+                                        color: Colors.red
+                                    )
+                                ),
+                                focusedErrorBorder:UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        width: 2,
+                                        color: Colors.red
+                                    )
+                                ),
                                 errorStyle: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -97,18 +194,40 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               controller: _EmailController,
                               validator:EmailValidatorAll,
                             ),
+
                             SizedBox(
                               height: 20,
                             ),
+
+                            //password :
+
                             TextFormField(
                               obscureText: !isVisibile,
                               showCursor: true,
                               keyboardType: TextInputType.text,
                               decoration: InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Color(0xff2B106A),
+                                        width: 2
+                                    )
+                                ),
                                 errorStyle: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     fontFamily: "Montserratmini"
+                                ),
+                                errorBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                    width: 2,
+                                    color: Colors.red
+                                  )
+                                ),
+                                focusedErrorBorder:UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 2,
+                                      color: Colors.red
+                                  )
                                 ),
                                 prefixIcon: Icon(
                                   Icons.lock,
@@ -136,35 +255,120 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               controller: _PasswordController,
                               validator: PasswordValidator
                             ),
+
                             SizedBox(
                               height:70,
                             ),
+
                             Center(
+
                               child:FlatButton(
+
                                 color: Color(0xff2B106A),
                                 minWidth: widthScreen*(0.8),
                                 height: 50,
-                                onPressed: ()async{
-                                 if(validateAndSave()){
-                                 setState(() {
-                                   Waiting=true;
-                                 });
-                                 dynamic user=await _auth.RegisterWithEmailAndPassword(_EmailController.text.trim(), _PasswordController.text,_NameController.text);
-                                 if(user!=null){
-                                   Navigator.pop(context);
-                                 }
-                                 setState(() {
-                                   Waiting=false;
-                                 });
-                                 if(user==null){
-                                   setState(() {
-                                     EmailUsed=true;
-                                   });
-                                   validateAndSave();
-                                 }
+
+                                onPressed: () async {
+
+                                if(  validateAndSave()){
+
+                                  sendOTP();
+
+                                  showDialog(context: context,
+                                      builder: (context)=>
+                                          AlertDialog(
+                                            title: Text("Enter the OTP received"),
+                                            content: TextField(
+                                              showCursor: true,
+                                              keyboardType: TextInputType.number,
+
+                                              decoration: InputDecoration(
+                                                focusedBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: Color(0xff2B106A),
+                                                        width: 2
+                                                    )
+                                                ),
+                                                errorBorder: UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        width: 2,
+                                                        color: Colors.red
+                                                    )
+                                                ),
+                                                focusedErrorBorder:UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        width: 2,
+                                                        color: Colors.red
+                                                    )
+                                                ),
+
+                                                labelText: 'OPT..',
+                                                labelStyle: TextStyle(
+                                                  color: Color(0xffc7c1cc),
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+
+                                              controller: _OTPController,
+                                            ),
+                                            actions: [
+                                              FlatButton(onPressed:( ) async{
+
+                                               if( verifyOTP()){
+
+                                                 dynamic user = await _auth.RegisterWithEmailAndPassword(
+                                                     _EmailController.text.trim(),
+                                                     _PasswordController.text,_NameController.text
+                                                 );
+
+                                                 if(user != null){
+
+                                                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                     content: Text("SignUp Success"),
+                                                   ));
+
+                                                   dynamic result = await _auth
+                                                       .LoginWithEmailAndPassword(
+                                                       _EmailController.text.trim(),
+                                                       _PasswordController.text);
+
+                                                   if (result != null) {
+
+                                                     //Shared preference :
+                                                     SharedPreferences prefs = await SharedPreferences.getInstance() ;
+                                                     print(_EmailController.text.trim());
+                                                     prefs.setString("email",_EmailController.text.trim());
+
+
+                                                     user = await _auth.UserFromDatabase(result);
+                                                     print(user.id);
+                                                     prefs.setString("userId", user.id);
+                                                     WriteLoginStatue(true);
+
+                                                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage(id:user.id))
+                                                     );
+                                                   }
+                                                //   Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>LoginScreen()));
+                                                 }
+                                                 if(user==null){
+
+                                                   setState(() {
+                                                     EmailUsed=true;
+                                                   });
+
+                                                   validateAndSave();
+                                                 }
+                                               }
+
+                                              },
+                                                  child: Text("Enter")),
+                                            ],
+                                          )
+                                  );
                                  EmailUsed=false;
                                  }
                                 },
+
                                 child: Text(
                                   'SIGN UP',
                                   style: TextStyle(
@@ -211,6 +415,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                           ],
                         ),
+
                         Container(
                           child: Waiting?spinkit():null,
                         )
@@ -219,6 +424,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
               ),
+
             ),
           ),
         ),
@@ -235,10 +441,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return 'Please enter a valid Email';
     }
     if(EmailUsed){
-      return "This Email is already used !";
+      return "This Email is invalid or already used !";
     }
     return null;
   }
+
   bool validateAndSave() {
     final form = globalKey.currentState;
     if (form.validate()) {
